@@ -14,6 +14,7 @@ while cap.isOpened():
     if not ret:
         break
 
+    frame = cv2.flip(frame, 1)
     current_time = time.time()
     fps = 1 / (current_time - prev_time)
     prev_time = current_time
