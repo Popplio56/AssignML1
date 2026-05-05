@@ -47,6 +47,9 @@ class CaptureImages:
             
             while True:
                 ret, frame = self.cap.read()
+
+                frame = cv2.flip(frame, 1)  # Mirror the image for a more natural selfie view
+
                 # Show a "Waiting" screen
                 waiting_frame = cv2.putText(frame.copy(), f"Ready for: {item}?", (50, 50), 
                                           cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
@@ -62,6 +65,33 @@ class CaptureImages:
 
             # This is the actual data taking loop
             for i in range(num_images):
+                success, _ = self.capture_single_image(item)
+                
+                if not success:
+                    break
+                
+                # Tiny sleep so it doesn't take 20 photos in 1 second
+                time.sleep(sleep_time)
+            
+            print(f"Finished capturing {item}!")
+
+
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('s'): # Press 's' to start the loop for this specific class
+                break
+            elif key == ord('q'): # Press 'q' to stop everything
+                self.cap.release()
+                cv2.destroyAllWindows()
+                return
+
+            # This is the actual data taking loop
+            # Decide how many images based on class type
+            if len(item) == 1 and item.isalpha():  # A, B, C...
+                images_to_take = 5
+            else:
+                images_to_take = 15
+
+            for i in range(images_to_take):
                 success, _ = self.capture_single_image(item)
                 
                 if not success:
